@@ -67,8 +67,8 @@ pipeline {
                     dir('ansiblerole') {
                         sh '''
                             export PEM_FILE_PATH=${PEM_FILE_PATH}
-                            ansible-inventory -i aws_ec2.yaml --graph
-                            ansible-playbook -i aws_ec2.yaml playbook.yml
+                            ansible-inventory -i inventory.aws_ec2.yaml --graph
+                            ansible-playbook -i inventory.aws_ec2.yaml playbook.yml
                         '''
                     }
                 }
