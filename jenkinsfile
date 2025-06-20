@@ -63,7 +63,9 @@ pipeline {
                 expression { return params.action == 'apply' }
             }
             steps {
-                withCredentials([string(credentialsId: 'PEM_FILE_SECRET', variable: 'PEM_FILE_PATH')]) {
+                withCredentials([
+                    string(credentialsId: 'PEM_FILE_SECRET', variable: 'PEM_FILE_PATH')
+                ]) {
                     dir('ansiblerole') {
                         sh '''
                             export PEM_FILE_PATH=${PEM_FILE_PATH}
