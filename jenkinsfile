@@ -18,15 +18,15 @@ pipeline {
 
         stage('Terraform Init & Plan') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'AWS_ACCESS_KEY_ID'
-                ]]) {
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_KEY_ID'],
+                    string(credentialsId: 'PEM_FILE_PATH', variable: 'PEM_FILE_PATH')
+                ]) {
                     dir('terraform-postgresql-infra') {
                         sh '''
                             terraform init
                             terraform validate
-                            terraform plan
+                            terraform plan -var="pem_file_path=${PEM_FILE_PATH}"
                         '''
                     }
                 }
@@ -35,13 +35,13 @@ pipeline {
 
         stage('Terraform Apply/Destroy') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'AWS_ACCESS_KEY_ID'
-                ]]) {
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_KEY_ID'],
+                    string(credentialsId: 'PEM_FILE_PATH', variable: 'PEM_FILE_PATH')
+                ]) {
                     dir('terraform-postgresql-infra') {
                         sh '''
-                            terraform ${action} --auto-approve
+                            terraform ${action} -var="pem_file_path=${PEM_FILE_PATH}" --auto-approve
                         '''
                     }
                 }
