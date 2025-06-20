@@ -63,10 +63,24 @@ pipeline {
                 expression { return params.action == 'apply' }
             }
             steps {
-                withCredentials([string(credentialsId: 'PEM_FILE_PATH', variable: 'PEM_FILE_PATH')]) {
+                withCredentials([
+                    string(credentialsId: 'PEM_FILE_PATH', variable: 'PEM_FILE_PATH'),
+                    [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_KEY_ID']
+                ]) {
+                    script {
+                        env.BASTION_IP = sh(
+                            script: 'cd terraform-postgresql-infra && terraform output -raw bastion_public_ip',
+                            returnStdout: true
+                        ).trim()
+                    }
+
                     dir('ansiblerole') {
                         sh '''
                             export PEM_FILE_PATH=${PEM_FILE_PATH}
+                            export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+                            export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+                            export BASTION_IP=${BASTION_IP}
+
                             ansible-inventory -i inventory.aws_ec2.yaml --graph
                             ansible-playbook -i inventory.aws_ec2.yaml playbook.yml
                         '''
