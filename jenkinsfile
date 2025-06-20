@@ -22,7 +22,7 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'AWS_ACCESS_KEY_ID'
                 ]]) {
-                    dir('one_click_infra/terraform-postgresql-infra') {
+                    dir('terraform-postgresql-infra') {
                         sh '''
                             terraform init
                             terraform validate
@@ -39,7 +39,7 @@ pipeline {
                     $class: 'AmazonWebServicesCredentialsBinding',
                     credentialsId: 'AWS_ACCESS_KEY_ID'
                 ]]) {
-                    dir('one_click_infra/terraform-postgresql-infra') {
+                    dir('terraform-postgresql-infra') {
                         sh '''
                             terraform ${action} --auto-approve
                         '''
