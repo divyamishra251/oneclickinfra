@@ -20,7 +20,7 @@ pipeline {
             steps {
                 withCredentials([
                     [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_KEY_ID'],
-                    string(credentialsId: 'PEM_FILE_PATH', variable: 'PEM_FILE_PATH')
+                    string(credentialsId: 'PEM_FILE_SECRET', variable: 'PEM_FILE_PATH')
                 ]) {
                     dir('terraform-postgresql-infra') {
                         sh '''
@@ -37,7 +37,7 @@ pipeline {
             steps {
                 withCredentials([
                     [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'AWS_ACCESS_KEY_ID'],
-                    string(credentialsId: 'PEM_FILE_PATH', variable: 'PEM_FILE_PATH')
+                    string(credentialsId: 'PEM_FILE_SECRET', variable: 'PEM_FILE_PATH')
                 ]) {
                     dir('terraform-postgresql-infra') {
                         sh '''
@@ -63,12 +63,14 @@ pipeline {
                 expression { return params.action == 'apply' }
             }
             steps {
-                input message: 'Do you want to run the Ansible playbook?', ok: 'Yes'
-                dir('ansiblerole') {
-                    sh '''
-                        ansible-inventory -i aws_ec2.yaml --graph
-                        ansible-playbook -i aws_ec2.yaml playbook.yml
-                    '''
+                withCredentials([string(credentialsId: 'PEM_FILE_SECRET', variable: 'PEM_FILE_PATH')]) {
+                    dir('ansiblerole') {
+                        sh '''
+                            export PEM_FILE_PATH=${PEM_FILE_PATH}
+                            ansible-inventory -i aws_ec2.yaml --graph
+                            ansible-playbook -i aws_ec2.yaml playbook.yml
+                        '''
+                    }
                 }
             }
         }

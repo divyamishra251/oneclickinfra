@@ -3,17 +3,15 @@ plugin: aws_ec2
 regions:
   - ap-south-1
 
-# Filter private cluster nodes by name
 filters:
   tag:Name:
     - "pg-private-1"
     - "pg-private-2"
 
-# Compose proxy from bastion role-tag
 compose:
   ansible_host: private_ip_address
   ansible_ssh_common_args: >
-    -o ProxyCommand="ssh -i /home/ubuntu/apsouth.pem -o StrictHostKeyChecking=no -W %h:%p ubuntu@{{ groups['tag_Role_bastion'][0] }}"
+    -o ProxyCommand="ssh -i {{ lookup('env','PEM_FILE_PATH') }} -o StrictHostKeyChecking=no -W %h:%p ubuntu@{{ groups['tag_Role_bastion'][0] }}"
 
 strict: False
 cache: True
