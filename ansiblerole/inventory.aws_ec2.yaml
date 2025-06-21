@@ -9,6 +9,7 @@ filters:
     - "pg-private-2"
 
 compose:
+  ansible_user: ubuntu
   ansible_host: private_ip_address
   ansible_ssh_common_args: >
     -o ProxyCommand="ssh -i $PEM_FILE_PATH -o StrictHostKeyChecking=no -W %h:%p ubuntu@$BASTION_IP"
